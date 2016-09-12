@@ -31,6 +31,7 @@ class shexCodecTest extends FunSpec with Matchers with EitherValues {
    codecValueTest[ShapeExpr](NodeConstraint(Some(NonLiteralKind), None, List(), None))
    codecValueTest[ShapeExpr](NodeConstraint(Some(BNodeKind), None, List(), None))
    codecValueTest[ShapeExpr](NodeConstraint(None, Some(IRI("http://datatype.org/int")), List(), None))
+   codecValueTest[ShapeExpr](NodeConstraint(None, Some(IRI("http://datatype.org/int")), List(Length(0)), None))
    codecValueTest[ShapeExpr](ShapeRef(IRI("x")))
    codecValueTest[ShapeExpr](ShapeExternal())
   }

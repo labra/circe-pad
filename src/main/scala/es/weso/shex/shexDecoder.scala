@@ -1,10 +1,10 @@
 package es.weso.shex
 import io.circe._
 import io.circe.syntax._
-import cats.data._
-import es.weso.rdf.nodes._
 import cats._
+import cats.data._
 import cats.implicits._
+import es.weso.rdf.nodes._
 
 object shexDecoder {
 
@@ -36,17 +36,26 @@ implicit lazy val decodeShapeExpr: Decoder[ShapeExpr] = Decoder.instance { c =>
 }
 
 implicit lazy val decodeShapeOr: Decoder[ShapeOr] = Decoder.instance { c =>
-  ???
+ for {
+   _ <- fixedFieldValue(c, "type", "ShapeOr")
+   ses <- fieldDecode[List[ShapeExpr]](c, "shapeExprs")
+ } yield ShapeOr(ses)
 }
 
 
 implicit lazy val decodeShapeAnd: Decoder[ShapeAnd] = Decoder.instance { c =>
-  ???
+ for {
+   _ <- fixedFieldValue(c, "type", "ShapeAnd")
+   ses <- fieldDecode[List[ShapeExpr]](c, "shapeExprs")
+ } yield ShapeAnd(ses)
 }
 
 
 implicit lazy val decodeShapeNot: Decoder[ShapeNot] = Decoder.instance { c =>
-  ???
+ for {
+   _ <- fixedFieldValue(c, "type", "ShapeNot")
+   se <- fieldDecode[ShapeExpr](c, "shapeExpr")
+ } yield ShapeNot(se)
 }
 
 
@@ -60,7 +69,18 @@ implicit lazy val decodeNodeConstraint: Decoder[NodeConstraint] = Decoder.instan
 }
 
 def getXsFacets(c: HCursor): List[XsFacet] = {
-  List()
+  val fields = c.fields.getOrElse(List())
+  val rs = fields.map(extractXsFacet(_,c))
+  ???
+}
+
+def extractXsFacet(name: String, c: HCursor): Xor[DecodingFailure,Option[XsFacet]] = {
+  name match {
+    case "length" => c.field(name).as[Int].map(n => Some(Length(n)))
+    case "minlength" => c.field(name).as[Int].map(n => Some(MinLength(n)))
+    case "maxlength" => c.field(name).as[Int].map(n => Some(MaxLength(n)))
+    case _ => None.right
+  }
 }
 
 implicit lazy val decodeNodeKind: Decoder[NodeKind] = Decoder.instance { c =>
