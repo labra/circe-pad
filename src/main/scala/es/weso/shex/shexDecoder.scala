@@ -1,5 +1,6 @@
 package es.weso.shex
 import io.circe._
+import io.circe.syntax._
 import cats.data._
 import es.weso.rdf.nodes._
 import cats._
@@ -27,7 +28,7 @@ implicit lazy val decodeShapeExpr: Decoder[ShapeExpr] = Decoder.instance { c =>
       case "ShapeOr" => c.as[ShapeOr]
       case "ShapeAnd" => c.as[ShapeAnd]
       case "ShapeNot" => c.as[ShapeNot]
-      case "NodeConstraint" => c.as[NodeConstraint]
+      case "NodeConstraint" =>  c.as[NodeConstraint]
       case "Shape" => c.as[Shape]
       case "ShapeRef" => c.as[ShapeRef]
       case "ShapeExternal" => c.as[ShapeExternal]
@@ -53,15 +54,23 @@ implicit lazy val decodeNodeConstraint: Decoder[NodeConstraint] = Decoder.instan
   for {
     _ <- fixedFieldValue(c, "type", "NodeConstraint")
     nodeKind <- optFieldDecode[NodeKind](c, "nodeKind")
-  } yield NodeConstraint(nodeKind, None, List(), None)
+    datatype <- optFieldDecode[IRI](c, "datatype")
+    values <- optFieldDecode[List[ValueSetValue]](c,"values")
+  } yield NodeConstraint(nodeKind, datatype, getXsFacets(c), values)
+}
+
+def getXsFacets(c: HCursor): List[XsFacet] = {
+  List()
 }
 
 implicit lazy val decodeNodeKind: Decoder[NodeKind] = Decoder.instance { c =>
-  c.downField("nodeKind").as[String].flatMap {
+  c.field("nodeKind").as[String].flatMap {
     case "iri" => IRIKind.right
     case "bnode" => BNodeKind.right
-    case "nonliteral" => NonLiteralKind.right
+    case "nonLiteral" => NonLiteralKind.right
     case "literal" => LiteralKind.right
+    case other => 
+      Xor.left(DecodingFailure(s"Decoding nodeKind. Unexpected value $other", Nil))
   }
 }
 
@@ -84,6 +93,9 @@ implicit lazy val decodeShapeExternal: Decoder[ShapeExternal] = Decoder.instance
  } yield ShapeExternal()
 }
 
+implicit lazy val decodeValueSetValue: Decoder[ValueSetValue] = Decoder.instance { c =>
+  c.as[String].flatMap(s => IRIValue(IRI(s)).right)
+}
 
 implicit lazy val decodeTripleConstraint: Decoder[TripleConstraint] = Decoder.instance { c =>
  for {
