@@ -72,16 +72,16 @@ implicit lazy val showStemValue: Show[StemValue] = new Show[StemValue] {
 
 implicit lazy val showXsFacet: Show[XsFacet] = new Show[XsFacet] {
   final def show(a: XsFacet): String = a match {
-    case Length(v) => s"length(${v.show})"
-    case MinLength(v) => s"minlength(${v.show})"
-    case MaxLength(v) => s"maxlength(${v.show})"
-    case Pattern(v) => s"pattern(${v.show})"
-    case MinInclusive(n) => s"minInclusive(${n.show})"
-    case MaxInclusive(n) => s"maxInclusive(${n.show})"
-    case MinExclusive(n) => s"minExclusive(${n.show})"
-    case MaxExclusive(n) => s"maxExclusive(${n.show})"
-    case TotalDigits(n) => s"totalDigits(${n.show})"
-    case FractionDigits(n) => s"fractionDigits(${n.show})"
+    case Length(v) => s"${a.fieldName}(${v.show})"
+    case MinLength(v) => s"${a.fieldName}(${v.show})"
+    case MaxLength(v) => s"${a.fieldName}(${v.show})"
+    case Pattern(v) => s"${a.fieldName}(${v.show})"
+    case MinInclusive(n) => s"${a.fieldName}(${n.show})"
+    case MaxInclusive(n) => s"${a.fieldName}(${n.show})"
+    case MinExclusive(n) => s"${a.fieldName}(${n.show})"
+    case MaxExclusive(n) => s"${a.fieldName}(${n.show})"
+    case TotalDigits(n) => s"${a.fieldName}(${n.show})"
+    case FractionDigits(n) => s"${a.fieldName}(${n.show})"
   }
 }
 

@@ -8,6 +8,14 @@ import cats.implicits._
 
 object shexEncoder {
 
+  implicit lazy val encodeSchema= new Encoder[Schema] {
+   final def apply(s: Schema): Json = ??? 
+  }
+
+  implicit lazy val encodePrefix = new Encoder[Prefix] {
+   final def apply(p: Prefix): Json = ??? 
+  }
+  
   implicit lazy val encodeIRI = new Encoder[IRI] {
    final def apply(iri: IRI): Json = Json.fromString(iri.str) 
   }
@@ -133,16 +141,16 @@ def mkFieldsFacets(xs: List[XsFacet]): List[Option[(String,Json)]] = {
 
 def mkFieldFacet(x: XsFacet): (String,Json) = 
   x match {
-  case Length(v) => ("length",Json.fromInt(v))
-  case MinLength(v) => ("minlength",Json.fromInt(v))
-  case MaxLength(v) => ("maxlength",Json.fromInt(v))
-  case Pattern(p) => ("pattern",Json.fromString(p))
-  case MinInclusive(n) => ("mininclusive",encodeNumeric(n))
-  case MaxInclusive(n) => ("maxinclusive",encodeNumeric(n))
-  case MinExclusive(n) => ("minexclusive",encodeNumeric(n))
-  case MaxExclusive(n) => ("maxexclusive",encodeNumeric(n))
-  case TotalDigits(n) => ("totaldigits",Json.fromInt(n))
-  case FractionDigits(n) => ("fractiondigits",Json.fromInt(n))
+  case Length(v) => (x.fieldName,Json.fromInt(v))
+  case MinLength(v) => (x.fieldName,Json.fromInt(v))
+  case MaxLength(v) => (x.fieldName,Json.fromInt(v))
+  case Pattern(p) => (x.fieldName,Json.fromString(p))
+  case MinInclusive(n) => (x.fieldName,encodeNumeric(n))
+  case MaxInclusive(n) => (x.fieldName,encodeNumeric(n))
+  case MinExclusive(n) => (x.fieldName,encodeNumeric(n))
+  case MaxExclusive(n) => (x.fieldName,encodeNumeric(n))
+  case TotalDigits(n) => (x.fieldName,Json.fromInt(n))
+  case FractionDigits(n) => (x.fieldName,Json.fromInt(n))
 }
 
 implicit lazy val encodeNumeric: Encoder[NumericLiteral] = new Encoder[NumericLiteral] {

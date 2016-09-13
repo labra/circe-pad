@@ -1,6 +1,16 @@
 package es.weso.shex
 import es.weso.rdf.nodes._
 
+case class Schema(
+    prefixes: Option[Map[Prefix,IRI]],
+    base: Option[IRI],
+    startActs: Option[List[SemAct]],
+    start: Option[ShapeExpr],
+    shapes: Option[Map[ShapeLabel,ShapeExpr]]
+)
+
+case class Prefix(s: String)
+
 abstract sealed trait ShapeExpr
 
 case class ShapeOr(shapeExprs: List[ShapeExpr]) extends ShapeExpr
@@ -43,20 +53,45 @@ object NodeConstraint {
 
 }
 
-sealed trait XsFacet
+sealed trait XsFacet {
+  val fieldName: String
+}
 sealed trait StringFacet extends XsFacet
-case class Length(v: Int) extends StringFacet
-case class MinLength(v:Int) extends StringFacet
-case class MaxLength(v:Int) extends StringFacet
-case class Pattern(p: String) extends StringFacet
+case class Length(v: Int) extends StringFacet {
+  val fieldName = "length"
+}
+
+case class MinLength(v:Int) extends StringFacet {
+  val fieldName = "minlength"
+}
+
+case class MaxLength(v:Int) extends StringFacet {
+  val fieldName = "maxlength"
+}
+
+case class Pattern(p: String) extends StringFacet {
+  val fieldName = "pattern"
+}
 
 sealed trait NumericFacet extends XsFacet
-case class MinInclusive(n: NumericLiteral) extends NumericFacet
-case class MinExclusive(n: NumericLiteral) extends NumericFacet
-case class MaxInclusive(n: NumericLiteral) extends NumericFacet
-case class MaxExclusive(n: NumericLiteral) extends NumericFacet
-case class TotalDigits(n: Int) extends NumericFacet
-case class FractionDigits(n: Int) extends NumericFacet
+case class MinInclusive(n: NumericLiteral) extends NumericFacet {
+  val fieldName = "mininclusive"
+}
+case class MinExclusive(n: NumericLiteral) extends NumericFacet {
+  val fieldName = "minexclusive"
+}
+case class MaxInclusive(n: NumericLiteral) extends NumericFacet {
+  val fieldName = "maxinclusive"
+}
+case class MaxExclusive(n: NumericLiteral) extends NumericFacet {
+  val fieldName = "maxexclusive"
+}
+case class TotalDigits(n: Int) extends NumericFacet {
+  val fieldName = "totaldigits"
+}
+case class FractionDigits(n: Int) extends NumericFacet {
+  val fieldName = "fractiondigits"
+}
 
 sealed trait NumericLiteral
 case class NumericInt(n: Int) extends NumericLiteral

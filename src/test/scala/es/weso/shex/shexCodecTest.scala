@@ -12,6 +12,32 @@ import cats.implicits._
 import es.weso.rdf.nodes._
 
 class shexCodecTest extends FunSpec with Matchers with EitherValues {
+
+  describe("Prefix parser") {
+    it ("Should parse prefix") {
+     val str = "pepe"
+     parsePrefix(str) match {
+      case Xor.Right(p) => info(s"Parsed ok as $p")
+      case Xor.Left(e) => fail(s"Error parsing $str: $e") 
+     }
+    }
+   it ("Should parse lang string") {
+     val str = "\"pepe\"@es"
+     parseLang(str) match {
+      case Xor.Right(p) => info(s"Parsed ok as $p")
+      case Xor.Left(e) => fail(s"Error parsing $str: $e") 
+     }
+    }
+
+  }
+  
+  describe("Shape Label") {
+   codecValueTest[IRI](IRI("x"))
+   codecValueTest[ShapeLabel](IRILabel(IRI("http://example.org/")))
+   codecValueTest[ShapeLabel](BNodeLabel(BNodeId("x")))
+  }
+
+  
   describe("Max codec") {
    codecValueTest[Max](IntMax(5))
    codecValueTest[Max](Star)
@@ -32,6 +58,8 @@ class shexCodecTest extends FunSpec with Matchers with EitherValues {
    codecValueTest[ShapeExpr](NodeConstraint(Some(BNodeKind), None, List(), None))
    codecValueTest[ShapeExpr](NodeConstraint(None, Some(IRI("http://datatype.org/int")), List(), None))
    codecValueTest[ShapeExpr](NodeConstraint(None, Some(IRI("http://datatype.org/int")), List(Length(0)), None))
+   codecValueTest[ShapeExpr](NodeConstraint(None, Some(IRI("http://datatype.org/int")), List(Length(0),MinInclusive(NumericDouble(2.3))), None))
+   codecValueTest[ShapeExpr](NodeConstraint(Some(BNodeKind), Some(IRI("http://datatype.org/int")), List(MinLength(2),MaxLength(5),Pattern("*.ex")), Some(List(StringValue("x")))))
    codecValueTest[ShapeExpr](ShapeRef(IRI("x")))
    codecValueTest[ShapeExpr](ShapeExternal())
   }
